@@ -1,6 +1,6 @@
 -----------------------------------
 --
--- ABILITIES
+-- JOB ABILITIES
 --
 -----------------------------------
 require("scripts/globals/status")
