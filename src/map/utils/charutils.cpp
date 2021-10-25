@@ -3667,6 +3667,8 @@ namespace charutils
         if (PChar->isDead())
             return;
 
+        bool HasLeveled = false;
+
         if (!expFromRaise)
         {
             exp = (uint32)(exp * map_config.exp_rate);
@@ -3728,6 +3730,7 @@ namespace charutils
         {
             //add normal exp
             PChar->jobs.exp[PChar->GetMJob()] += exp;
+            PChar->jobs.exp[PChar->GetSJob()] += exp;
         }
 
         if (!expFromRaise)
@@ -3793,8 +3796,7 @@ namespace charutils
                 }
                 PChar->jobs.job[PChar->GetMJob()] += 1;
 
-                if (PChar->m_LevelRestriction == 0 ||
-                    PChar->m_LevelRestriction > PChar->GetMLevel())
+                if (PChar->m_LevelRestriction == 0 || PChar->m_LevelRestriction > PChar->GetMLevel())
                 {
                     PChar->SetMLevel(PChar->jobs.job[PChar->GetMJob()]);
                     PChar->SetSLevel(PChar->jobs.job[PChar->GetSJob()]);
@@ -3829,28 +3831,97 @@ namespace charutils
                 SaveCharJob(PChar, PChar->GetMJob());
                 SaveCharExp(PChar, PChar->GetMJob());
 
-                PChar->pushPacket(new CCharJobsPacket(PChar));
-                PChar->pushPacket(new CCharUpdatePacket(PChar));
-                PChar->pushPacket(new CCharSkillsPacket(PChar));
-                PChar->pushPacket(new CCharRecastPacket(PChar));
-                PChar->pushPacket(new CCharAbilitiesPacket(PChar));
-                PChar->pushPacket(new CMenuMeritPacket(PChar));
-                PChar->pushPacket(new CCharJobExtraPacket(PChar, true));
-                PChar->pushPacket(new CCharJobExtraPacket(PChar, true));
-                PChar->pushPacket(new CCharSyncPacket(PChar));
-
                 PChar->loc.zone->PushPacket(PChar, CHAR_INRANGE_SELF, new CMessageCombatPacket(PChar, PMob, PChar->jobs.job[PChar->GetMJob()], 0, 9));
-                PChar->pushPacket(new CCharStatsPacket(PChar));
 
-                luautils::OnPlayerLevelUp(PChar);
-                PChar->updatemask |= UPDATE_HP;
-                return;
+                HasLeveled = true;
             }
+        }
+
+        if ((currentExp + exp) >= GetExpNEXTLevel(PChar->jobs.job[PChar->GetSJob()]) && !onLimitMode)
+        {
+            if (PChar->jobs.job[PChar->GetSJob()] >= PChar->jobs.genkai)
+            {
+                PChar->jobs.exp[PChar->GetSJob()] = GetExpNEXTLevel(PChar->jobs.job[PChar->GetSJob()]) - 1;
+                if (PChar->PParty && PChar->PParty->GetSyncTarget() == PChar)
+                {
+                    PChar->PParty->SetSyncTarget(nullptr, 556);
+                }
+            }
+            else
+            {
+                PChar->jobs.exp[PChar->GetSJob()] -= GetExpNEXTLevel(PChar->jobs.job[PChar->GetSJob()]);
+                if (PChar->jobs.exp[PChar->GetSJob()] >= GetExpNEXTLevel(PChar->jobs.job[PChar->GetSJob()] + 1))
+                {
+                    PChar->jobs.exp[PChar->GetSJob()] = GetExpNEXTLevel(PChar->jobs.job[PChar->GetSJob()] + 1) - 1;
+                }
+                PChar->jobs.job[PChar->GetSJob()] += 1;
+
+                if (PChar->m_LevelRestriction == 0 || PChar->m_LevelRestriction > PChar->GetMLevel())
+                {
+                    PChar->SetMLevel(PChar->jobs.job[PChar->GetMJob()]);
+                    PChar->SetSLevel(PChar->jobs.job[PChar->GetSJob()]);
+
+                    BuildingCharSkillsTable(PChar);
+                    CalculateStats(PChar);
+                    BuildingCharAbilityTable(PChar);
+                    BuildingCharTraitsTable(PChar);
+                    BuildingCharWeaponSkills(PChar);
+                    if (PChar->PAutomaton != nullptr && PChar->PAutomaton != PChar->PPet)
+                    {
+                        puppetutils::LoadAutomatonStats(PChar);
+                    }
+                }
+                PChar->PLatentEffectContainer->CheckLatentsJobLevel();
+
+                if (PChar->PParty != nullptr)
+                {
+                    if (PChar->PParty->GetSyncTarget() == PChar)
+                    {
+                        PChar->PParty->RefreshSync();
+                    }
+                    PChar->PParty->ReloadParty();
+                }
+
+                PChar->UpdateHealth();
+
+                PChar->health.hp = PChar->GetMaxHP();
+                PChar->health.mp = PChar->GetMaxMP();
+
+                SaveCharStats(PChar);
+                SaveCharJob(PChar, PChar->GetSJob());
+                SaveCharExp(PChar, PChar->GetSJob());
+
+                PChar->loc.zone->PushPacket(PChar, CHAR_INRANGE_SELF, new CMessageCombatPacket(PChar, PMob, PChar->jobs.job[PChar->GetSJob()], 0, 9));
+
+                HasLeveled = true;
+            }
+        }
+
+        if (HasLeveled)
+        {
+            PChar->pushPacket(new CCharJobsPacket(PChar));
+            PChar->pushPacket(new CCharUpdatePacket(PChar));
+            PChar->pushPacket(new CCharSkillsPacket(PChar));
+            PChar->pushPacket(new CCharRecastPacket(PChar));
+            PChar->pushPacket(new CCharAbilitiesPacket(PChar));
+            PChar->pushPacket(new CMenuMeritPacket(PChar));
+            PChar->pushPacket(new CCharJobExtraPacket(PChar, true));
+            PChar->pushPacket(new CCharJobExtraPacket(PChar, true));
+            PChar->pushPacket(new CCharSyncPacket(PChar));
+
+            PChar->pushPacket(new CCharStatsPacket(PChar));
+
+            luautils::OnPlayerLevelUp(PChar);
+            PChar->updatemask |= UPDATE_HP;
+
+            return;
         }
 
         SaveCharStats(PChar);
         SaveCharJob(PChar, PChar->GetMJob());
         SaveCharExp(PChar, PChar->GetMJob());
+        SaveCharJob(PChar, PChar->GetSJob());
+        SaveCharExp(PChar, PChar->GetSJob());
         PChar->pushPacket(new CCharStatsPacket(PChar));
 
         if (onLimitMode)
