@@ -1,4 +1,5 @@
-﻿/*
+﻿#include "charutils.h"
+/*
 ===========================================================================
 
 Copyright (c) 2010-2015 Darkstar Dev Teams
@@ -3789,50 +3790,7 @@ namespace charutils
             }
             else
             {
-                PChar->jobs.exp[PChar->GetMJob()] -= GetExpNEXTLevel(PChar->jobs.job[PChar->GetMJob()]);
-                if (PChar->jobs.exp[PChar->GetMJob()] >= GetExpNEXTLevel(PChar->jobs.job[PChar->GetMJob()] + 1))
-                {
-                    PChar->jobs.exp[PChar->GetMJob()] = GetExpNEXTLevel(PChar->jobs.job[PChar->GetMJob()] + 1) - 1;
-                }
-                PChar->jobs.job[PChar->GetMJob()] += 1;
-
-                if (PChar->m_LevelRestriction == 0 || PChar->m_LevelRestriction > PChar->GetMLevel())
-                {
-                    PChar->SetMLevel(PChar->jobs.job[PChar->GetMJob()]);
-                    PChar->SetSLevel(PChar->jobs.job[PChar->GetSJob()]);
-
-                    BuildingCharSkillsTable(PChar);
-                    CalculateStats(PChar);
-                    BuildingCharAbilityTable(PChar);
-                    BuildingCharTraitsTable(PChar);
-                    BuildingCharWeaponSkills(PChar);
-                    if (PChar->PAutomaton != nullptr && PChar->PAutomaton != PChar->PPet)
-                    {
-                        puppetutils::LoadAutomatonStats(PChar);
-                    }
-                }
-                PChar->PLatentEffectContainer->CheckLatentsJobLevel();
-
-                if (PChar->PParty != nullptr)
-                {
-                    if (PChar->PParty->GetSyncTarget() == PChar)
-                    {
-                        PChar->PParty->RefreshSync();
-                    }
-                    PChar->PParty->ReloadParty();
-                }
-
-                PChar->UpdateHealth();
-
-                PChar->health.hp = PChar->GetMaxHP();
-                PChar->health.mp = PChar->GetMaxMP();
-
-                SaveCharStats(PChar);
-                SaveCharJob(PChar, PChar->GetMJob());
-                SaveCharExp(PChar, PChar->GetMJob());
-
-                PChar->loc.zone->PushPacket(PChar, CHAR_INRANGE_SELF, new CMessageCombatPacket(PChar, PMob, PChar->jobs.job[PChar->GetMJob()], 0, 9));
-
+                AddExperiencePointsToJob(PChar, PMob, PChar->GetMJob());
                 HasLeveled = true;
             }
         }
@@ -3849,50 +3807,7 @@ namespace charutils
             }
             else
             {
-                PChar->jobs.exp[PChar->GetSJob()] -= GetExpNEXTLevel(PChar->jobs.job[PChar->GetSJob()]);
-                if (PChar->jobs.exp[PChar->GetSJob()] >= GetExpNEXTLevel(PChar->jobs.job[PChar->GetSJob()] + 1))
-                {
-                    PChar->jobs.exp[PChar->GetSJob()] = GetExpNEXTLevel(PChar->jobs.job[PChar->GetSJob()] + 1) - 1;
-                }
-                PChar->jobs.job[PChar->GetSJob()] += 1;
-
-                if (PChar->m_LevelRestriction == 0 || PChar->m_LevelRestriction > PChar->GetMLevel())
-                {
-                    PChar->SetMLevel(PChar->jobs.job[PChar->GetMJob()]);
-                    PChar->SetSLevel(PChar->jobs.job[PChar->GetSJob()]);
-
-                    BuildingCharSkillsTable(PChar);
-                    CalculateStats(PChar);
-                    BuildingCharAbilityTable(PChar);
-                    BuildingCharTraitsTable(PChar);
-                    BuildingCharWeaponSkills(PChar);
-                    if (PChar->PAutomaton != nullptr && PChar->PAutomaton != PChar->PPet)
-                    {
-                        puppetutils::LoadAutomatonStats(PChar);
-                    }
-                }
-                PChar->PLatentEffectContainer->CheckLatentsJobLevel();
-
-                if (PChar->PParty != nullptr)
-                {
-                    if (PChar->PParty->GetSyncTarget() == PChar)
-                    {
-                        PChar->PParty->RefreshSync();
-                    }
-                    PChar->PParty->ReloadParty();
-                }
-
-                PChar->UpdateHealth();
-
-                PChar->health.hp = PChar->GetMaxHP();
-                PChar->health.mp = PChar->GetMaxMP();
-
-                SaveCharStats(PChar);
-                SaveCharJob(PChar, PChar->GetSJob());
-                SaveCharExp(PChar, PChar->GetSJob());
-
-                PChar->loc.zone->PushPacket(PChar, CHAR_INRANGE_SELF, new CMessageCombatPacket(PChar, PMob, PChar->jobs.job[PChar->GetSJob()], 0, 9));
-
+                AddExperiencePointsToJob(PChar, PMob, PChar->GetSJob());
                 HasLeveled = true;
             }
         }
@@ -3931,6 +3846,53 @@ namespace charutils
         {
             roeutils::event(ROE_EXPGAIN, PChar, RoeDatagram("exp", exp));
         }
+    }
+
+    void AddExperiencePointsToJob(CCharEntity* PChar, CBaseEntity* PMob, JOBTYPE jobId)
+    {
+        PChar->jobs.exp[jobId] -= GetExpNEXTLevel(PChar->jobs.job[jobId]);
+        if (PChar->jobs.exp[jobId] >= GetExpNEXTLevel(PChar->jobs.job[jobId] + 1))
+        {
+            PChar->jobs.exp[jobId] = GetExpNEXTLevel(PChar->jobs.job[jobId] + 1) - 1;
+        }
+        PChar->jobs.job[jobId] += 1;
+
+        if (PChar->m_LevelRestriction == 0 || PChar->m_LevelRestriction > PChar->GetMLevel())
+        {
+            PChar->SetMLevel(PChar->jobs.job[PChar->GetMJob()]);
+            PChar->SetSLevel(PChar->jobs.job[PChar->GetSJob()]);
+
+            BuildingCharSkillsTable(PChar);
+            CalculateStats(PChar);
+            BuildingCharAbilityTable(PChar);
+            BuildingCharTraitsTable(PChar);
+            BuildingCharWeaponSkills(PChar);
+            if (PChar->PAutomaton != nullptr && PChar->PAutomaton != PChar->PPet)
+            {
+                puppetutils::LoadAutomatonStats(PChar);
+            }
+        }
+        PChar->PLatentEffectContainer->CheckLatentsJobLevel();
+
+        if (PChar->PParty != nullptr)
+        {
+            if (PChar->PParty->GetSyncTarget() == PChar)
+            {
+                PChar->PParty->RefreshSync();
+            }
+            PChar->PParty->ReloadParty();
+        }
+
+        PChar->UpdateHealth();
+
+        PChar->health.hp = PChar->GetMaxHP();
+        PChar->health.mp = PChar->GetMaxMP();
+
+        SaveCharStats(PChar);
+        SaveCharJob(PChar, jobId);
+        SaveCharExp(PChar, jobId);
+
+        PChar->loc.zone->PushPacket(PChar, CHAR_INRANGE_SELF, new CMessageCombatPacket(PChar, PMob, PChar->jobs.job[jobId], 0, 9));
     }
 
     /************************************************************************
