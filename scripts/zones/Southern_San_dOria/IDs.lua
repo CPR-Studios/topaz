@@ -6,6 +6,8 @@ require("scripts/globals/zone")
 
 zones = zones or {}
 
+-- 8421 -> Aucun texte
+
 zones[tpz.zone.SOUTHERN_SAN_DORIA] =
 {
     text =
@@ -65,12 +67,12 @@ zones[tpz.zone.SOUTHERN_SAN_DORIA] =
         PAUNELIE_SHOP_DIALOG           = 8319, -- These magic shells are full of mysteries...
         ITEM_DELIVERY_DIALOG           = 8414, -- Parcels delivered to rooms anywhere in Vana'diel!
         MACHIELLE_OPEN_DIALOG          = 8420, -- Might I interest you in produce from Norvallen?
-        CORUA_OPEN_DIALOG              = 8421, -- Ronfaure produce for sale!
+        CORUA_OPEN_DIALOG              = 8425, -- Ronfaure produce for sale!
         PHAMELISE_OPEN_DIALOG          = 8422, -- I've got fresh produce from Zulkheim!
         APAIREMANT_OPEN_DIALOG         = 8423, -- Might you be interested in produce from Gustaberg
         AVELINE_SHOP_DIALOG            = 8424, -- Welcome to Raimbroy's Grocery!
         MIOGIQUE_SHOP_DIALOG           = 8425, -- Looking for something in particular?
-        BENAIGE_SHOP_DIALOG            = 8425, -- Looking for something in particular?
+        BENAIGE_SHOP_DIALOG            = 8421, -- Looking for something in particular?
         CARAUTIA_SHOP_DIALOG           = 8426, -- Well, what sort of armor would you like?
         MACHIELLE_CLOSED_DIALOG        = 8427, -- We want to sell produce from Norvallen, but the entire region is under foreign control!
         CORUA_CLOSED_DIALOG            = 8428, -- We specialize in Ronfaure produce, but we cannot import from that region without a strong San d'Orian presence there.
