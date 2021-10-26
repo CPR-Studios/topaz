@@ -147,13 +147,7 @@ local selection =
 local travelType = tpz.teleport.type.HOMEPOINT
 
 local function getCost (from, to, key)
-
-    if HPs[from].group == HPs[to].group and HPs[to].group ~= 0 then
-        return 0
-    else
-        return (500 * HPs[to].fee) / (key and 5 or 1)
-    end
-
+    return 0
 end
 
 local function goToHP(player, choice, index)
