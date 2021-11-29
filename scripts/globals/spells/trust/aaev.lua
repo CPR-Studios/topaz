@@ -37,8 +37,10 @@ function onMobSpawn(mob)
     mob:addSimpleGambit(ai.t.SELF, ai.c.NOT_STATUS, tpz.effect.DIVINE_EMBLEM,
                         ai.r.JA, ai.s.SPECIFIC, tpz.ja.DIVINE_EMBLEM)
 
-    mob:addSimpleGambit(ai.t.SELF, ai.c.NOT_STATUS, tpz.effect.DIVINE_EMBLEM,
-                        ai.r.MA, ai.s.SPECIFIC, tpz.magic.spellFamily.HOLY)
+    -- mob:addSimpleGambit(ai.t.SELF, ai.c.NOT_STATUS, tpz.effect.DIVINE_EMBLEM,
+    --                    ai.r.MA, ai.s.SPECIFIC, tpz.magic.spellFamily.HOLY)
+
+    mob:addSimpleGambit(ai.t.SELF, ai.c.NOT_STATUS, tpz.effect.DIVINE_EMBLEM, ai.t.TARGET, ai.c.MB_AVAILABLE, 0, ai.r.MA, ai.s.MB_ELEMENT, tpz.magic.spellFamily.HOLY)
 
     mob:addSimpleGambit(ai.t.SELF, ai.c.NOT_STATUS, tpz.effect.CHIVALRY,
                         ai.r.JA, ai.s.SPECIFIC, tpz.ja.CHIVALRY)
