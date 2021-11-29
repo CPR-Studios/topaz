@@ -6,8 +6,8 @@ tpz = tpz or {}
 tpz.survivalGuide = tpz.survivalGuide or {}
 
 -- Determines if the survival guide teleport cost is like if you had a Rhapsody in White key item. Does not affect UI! (Default: 0)
-local SURVIVAL_GUIDE_TELEPORT_COST_GIL = 1000
-local SURVIVAL_GUIDE_TELEPORT_COST_TABS = 50
+local SURVIVAL_GUIDE_TELEPORT_COST_GIL = 1
+local SURVIVAL_GUIDE_TELEPORT_COST_TABS = 1
 
 -- This is used for the NationTeleport save/get
 local travelType = tpz.teleport.type.SURVIVAL
