@@ -42,15 +42,22 @@ function onSpellCast(caster, target, spell)
     dmg = adjustForTarget(target, dmg, spell:getElement())
     -- helix MAB merits are actually a percentage increase
     dmg = dmg * ((100 + merit*2)/100)
-    local dot = dmg
     -- add in final adjustments
     dmg = finalMagicAdjustments(caster, target, spell, dmg)
+    -- Dot always equal to dmg
+    local dot = dmg
     -- calculate Damage over time
-    dot = target:magicDmgTaken(dot)
+    -- dot = target:magicDmgTaken(dot)
 
     local duration = getHelixDuration(caster) + caster:getMod(tpz.mod.HELIX_DURATION)
 
-    duration = duration * (resist/2)
+    --Duration est toujours de 30/60/90 secondes
+    -- duration = duration * (resist/2)
+
+    --Hardcap that can't be broken
+    if(dot > 9999) then
+        dot = 9999;
+    end
 
     if (dot > 0) then
         target:addStatusEffect(tpz.effect.HELIX, dot, 3, duration)
