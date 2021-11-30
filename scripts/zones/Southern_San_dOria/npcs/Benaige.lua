@@ -29,8 +29,7 @@ function onTrigger(player, npc)
         5234,  198, 3,    -- Cibol
     }
 
-    -- player:showText(npc, ID.text.BENAIGE_SHOP_DIALOG)
-    player:showText(npc, "Welcome, is there anything you would like buy?")
+    player:showText(npc, ID.text.BENAIGE_SHOP_DIALOG)
     tpz.shop.nation(player, stock, tpz.nation.SANDORIA)
 end
 
